@@ -12,15 +12,13 @@ var app = express.Router();
 mongoose.connect("mongodb://localhost/googlebooks", { useNewUrlParser: true });
 
 
-app.get("/api/search/",(req, res) =>{
-    // console.log(req)
+app.get("/api/search/:id",(req, res) =>{
     let id = req.params.id;
     console.log("id = " +id+ "\n \n \n \n");
-    // id.split(" ").join("%20");
-    // console.log(id);
-    axios.get('https://www.googleapis.com/books/v1/volumes?q=to+kill+a+mockingbird&KEY=AIzaSyDuiU1KSuJb6SuKqjO5GOARr08t9YFD1lM').then(response => {
-        console.log(response.data.items);
-        res.send(response.data.items[0].volumeInfo)
+    id = id.split(" ").join("+");
+    console.log(id);
+    axios.get('https://www.googleapis.com/books/v1/volumes?q=' + id + '&KEY=AIzaSyDuiU1KSuJb6SuKqjO5GOARr08t9YFD1lM').then(response => {
+        res.send(response.data.items[0])
     })
 })
 
@@ -33,16 +31,11 @@ app.get("/api/searchdb", (req, res) => {
 
 
 
-app.post("api/save/", function(req, res) {
+app.post("/api/save/", function(req, res) {
     console.log(req.body)
-    Book.create(
-        {title: "title"},
-        {authors: "authors"},
-        {description: "description"},
-        {image: "image"},
-        {link: "link"},
-        {saved: true}, err =>{
+    Book.create(req.body, err =>{
             if (err) console.log(err);
+            else{console.log("added to db")}
         }
     );
 
